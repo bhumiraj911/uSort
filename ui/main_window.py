@@ -1,0 +1,83 @@
+from PySide6.QtWidgets import (
+    QWidget,
+    QVBoxLayout,
+    QGridLayout,
+)
+
+from ui import theme
+from ui.hero_card import HeroCard
+from ui.option_card import OptionCard
+
+
+
+class MainWindow(QWidget):
+    
+    def __init__(self):
+        super().__init__()
+
+        self.setup_window()
+        self.setup_layout()
+
+    def setup_window(self):
+        self.setWindowTitle("uSort")
+
+        self.resize(1200, 800)
+
+        self.setMinimumSize(1000, 700)
+
+        self.setStyleSheet(f"""
+            QWidget {{
+                background-color: {theme.BACKGROUND};
+                color: {theme.TEXT};
+                font-family: "{theme.FONT}";
+            }}
+        """)
+
+    def setup_layout(self):
+        self.layout = QVBoxLayout()
+
+        self.layout.setContentsMargins(
+            theme.PADDING,
+            theme.PADDING,
+            theme.PADDING,
+            theme.PADDING,
+        )
+
+        self.layout.setSpacing(theme.CARD_SPACING)
+
+        self.hero_card = HeroCard()
+
+        self.layout.addWidget(self.hero_card)
+        
+        self.grid = QGridLayout()
+        self.grid.setSpacing(theme.CARD_SPACING)
+
+        self.date_card = OptionCard(
+        "📅",
+        "Date Template",
+        "Year → Month → Day")
+
+        self.type_card = OptionCard(
+        "📂",
+        "File Type Template",
+        "Images • Videos")
+
+        self.templates_card = OptionCard(
+        "⭐",
+        "My Templates",
+        "No saved templates")
+
+        self.duplicates_card = OptionCard(
+        "🗑️",
+        "Remove Duplicates",
+        "Smart Detection")
+
+        self.grid.addWidget(self.date_card, 0, 0)
+        self.grid.addWidget(self.type_card, 0, 1)
+        self.grid.addWidget(self.templates_card, 1, 0)
+        self.grid.addWidget(self.duplicates_card, 1, 1)
+
+        self.layout.addLayout(self.grid)
+        
+
+        self.setLayout(self.layout)
