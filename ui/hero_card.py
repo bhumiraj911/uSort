@@ -12,14 +12,14 @@ from ui import theme
 class HeroCard(QFrame):
     def __init__(self):
         super().__init__()
-
         self.setup_ui()
 
     def setup_ui(self):
+        self.setObjectName("heroCard")
         self.setFixedHeight(175)
 
         self.setStyleSheet(f"""
-            QFrame {{
+            QFrame#heroCard {{
                 background-color: {theme.CARD};
                 border: 1px solid {theme.BORDER};
                 border-radius: {theme.CARD_RADIUS}px;
@@ -27,6 +27,7 @@ class HeroCard(QFrame):
 
             QLabel {{
                 background: transparent;
+                border: none;
                 color: {theme.TEXT};
                 font-size: 22px;
                 font-weight: 500;
@@ -39,24 +40,31 @@ class HeroCard(QFrame):
                 border-radius: 10px;
                 padding: 10px 20px;
                 font-size: 14px;
+                font-weight: 500;
             }}
 
             QPushButton:hover {{
                 background-color: #4F93FF;
             }}
+
+            QPushButton:pressed {{
+                background-color: #2F6FD6;
+            }}
         """)
 
         layout = QVBoxLayout(self)
-
+        layout.setContentsMargins(30, 25, 30, 25)
+        layout.setSpacing(18)
         layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        layout.setSpacing(16)
 
-        title = QLabel("Drop a folder here or browse")
-        title.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.title = QLabel("Drop a folder here or browse")
+        self.title.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-        browse = QPushButton("Select Folder")
-        browse.setFixedSize(180,46)
-        
-        layout.addWidget(title, alignment=Qt.AlignmentFlag.AlignCenter)
-        layout.addWidget(browse, alignment=Qt.AlignmentFlag.AlignCenter)
-        
+        self.browse_button = QPushButton("Select Folder")
+        self.browse_button.setFixedSize(180, 46)
+
+        layout.addWidget(self.title)
+        layout.addWidget(
+            self.browse_button,
+            alignment=Qt.AlignmentFlag.AlignCenter,
+        )
