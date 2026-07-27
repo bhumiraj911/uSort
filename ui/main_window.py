@@ -2,6 +2,7 @@ from PySide6.QtWidgets import (
     QWidget,
     QVBoxLayout,
     QGridLayout,
+    QFileDialog,
 )
 
 from ui import theme
@@ -9,9 +10,8 @@ from ui.hero_card import HeroCard
 from ui.option_card import OptionCard
 
 
-
 class MainWindow(QWidget):
-    
+
     def __init__(self):
         super().__init__()
 
@@ -45,32 +45,40 @@ class MainWindow(QWidget):
 
         self.layout.setSpacing(theme.CARD_SPACING)
 
+        # Hero Card
         self.hero_card = HeroCard()
-
         self.layout.addWidget(self.hero_card)
-        
+
+        # Connect Select Folder button
+        self.hero_card.browse_button.clicked.connect(self.select_folder)
+
+        # Option Cards
         self.grid = QGridLayout()
         self.grid.setSpacing(theme.CARD_SPACING)
 
         self.date_card = OptionCard(
-        "📅",
-        "Date Template",
-        "Year → Month → Day")
+            "📅",
+            "Date Template",
+            "Year → Month → Day"
+        )
 
         self.type_card = OptionCard(
-        "📂",
-        "File Type Template",
-        "Images • Videos")
+            "📂",
+            "File Type Template",
+            "Images • Videos"
+        )
 
         self.templates_card = OptionCard(
-        "⭐",
-        "My Templates",
-        "No saved templates")
+            "⭐",
+            "My Templates",
+            "No saved templates"
+        )
 
         self.duplicates_card = OptionCard(
-        "🗑️",
-        "Remove Duplicates",
-        "Smart Detection")
+            "🗑️",
+            "Remove Duplicates",
+            "Smart Detection"
+        )
 
         self.grid.addWidget(self.date_card, 0, 0)
         self.grid.addWidget(self.type_card, 0, 1)
@@ -78,6 +86,14 @@ class MainWindow(QWidget):
         self.grid.addWidget(self.duplicates_card, 1, 1)
 
         self.layout.addLayout(self.grid)
-        
 
         self.setLayout(self.layout)
+
+    def select_folder(self):
+        folder = QFileDialog.getExistingDirectory(
+            self,
+            "Select Folder"
+        )
+
+        if folder:
+            print(f"Selected Folder: {folder}")
