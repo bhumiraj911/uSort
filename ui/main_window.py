@@ -51,6 +51,11 @@ class MainWindow(QWidget):
 
         # Connect Select Folder button
         self.hero_card.browse_button.clicked.connect(self.select_folder)
+        
+        #drop folder signal
+        self.hero_card.folder_dropped.connect(
+            lambda folder: self.handle_folder_selected(folder)
+        )
 
         # Option Cards
         self.grid = QGridLayout()
@@ -96,4 +101,10 @@ class MainWindow(QWidget):
         )
 
         if folder:
-            print(f"Selected Folder: {folder}")
+            self.handle_folder_selected(folder)
+            
+    def handle_folder_selected(self, folder):
+        print(f"Selected Folder: {folder}")
+    
+        
+        print(f"Selected Folder: {folder}")

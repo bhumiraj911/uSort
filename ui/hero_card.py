@@ -1,4 +1,4 @@
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, Signal
 from PySide6.QtWidgets import (
     QFrame,
     QLabel,
@@ -10,6 +10,8 @@ from ui import theme
 
 
 class HeroCard(QFrame):
+    folder_dropped = Signal(str)
+
     def __init__(self):
         super().__init__()
         self.setup_ui()
@@ -17,6 +19,7 @@ class HeroCard(QFrame):
     def setup_ui(self):
         self.setObjectName("heroCard")
         self.setFixedHeight(175)
+        self.setAcceptDrops(True)
 
         self.setStyleSheet(f"""
             QFrame#heroCard {{
@@ -68,3 +71,29 @@ class HeroCard(QFrame):
             self.browse_button,
             alignment=Qt.AlignmentFlag.AlignCenter,
         )
+
+    def dragEnterEvent(self, event):
+        if event.mimeData().hasUrls():
+            event.acceptProposedAction()
+        else:
+            event.ignore()
+
+    def dragMoveEvent(self, event):
+        event.acceptProposedAction()
+
+    def dropEvent(self, event):
+        print("drop Event")
+        
+        urls = event.mimeData().urls()
+
+        if not urls:
+            return
+
+        folder = urls[0].toLocalFile()
+        
+        print(f"Dropped Folder: {folder}")
+        
+
+        self.folder_dropped.emit(folder)
+
+        event.acceptProposedAction()
