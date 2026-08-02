@@ -8,6 +8,8 @@ from PySide6.QtWidgets import (
 from ui import theme
 from ui.hero_card import HeroCard
 from ui.option_card import OptionCard
+from core.scanner import FolderScanner
+
 
 
 class MainWindow(QWidget):
@@ -105,6 +107,11 @@ class MainWindow(QWidget):
             
     def handle_folder_selected(self, folder):
         print(f"Selected Folder: {folder}")
-    
         
-        print(f"Selected Folder: {folder}")
+        scanner = FolderScanner()
+        
+        stats = scanner.scan(folder)
+        
+        print(stats)    
+        
+    
