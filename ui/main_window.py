@@ -2,6 +2,7 @@ from PySide6.QtWidgets import (
     QWidget,
     QVBoxLayout,
     QGridLayout,
+    QHBoxLayout,
     QFileDialog,
 )
 
@@ -9,7 +10,7 @@ from ui import theme
 from ui.hero_card import HeroCard
 from ui.option_card import OptionCard
 from core.scanner import FolderScanner
-
+from ui.stats_card import StatsCard
 
 
 class MainWindow(QWidget):
@@ -51,13 +52,15 @@ class MainWindow(QWidget):
         self.hero_card = HeroCard()
         self.layout.addWidget(self.hero_card)
 
-        # Connect Select Folder button
-        self.hero_card.browse_button.clicked.connect(self.select_folder)
-        
-        #drop folder signal
-        self.hero_card.folder_dropped.connect(
-            lambda folder: self.handle_folder_selected(folder)
-        )
+        # Main Content Area
+        self.content_layout = QHBoxLayout()
+        self.content_layout.setSpacing(theme.CARD_SPACING)
+
+        # Stats Card
+        self.stats_card = StatsCard()
+        self.stats_card.hide()
+
+        self.content_layout.addWidget(self.stats_card, 1)
 
         # Option Cards
         self.grid = QGridLayout()
@@ -92,7 +95,19 @@ class MainWindow(QWidget):
         self.grid.addWidget(self.templates_card, 1, 0)
         self.grid.addWidget(self.duplicates_card, 1, 1)
 
-        self.layout.addLayout(self.grid)
+        self.content_layout.addLayout(self.grid)
+
+        self.layout.addLayout(self.content_layout)
+
+        # Connect Select Folder button
+        self.hero_card.browse_button.clicked.connect(
+            self.select_folder
+        )
+
+        # Drop folder signal
+        self.hero_card.folder_dropped.connect(
+            lambda folder: self.handle_folder_selected(folder)
+        )
 
         self.setLayout(self.layout)
 
@@ -104,14 +119,15 @@ class MainWindow(QWidget):
 
         if folder:
             self.handle_folder_selected(folder)
-            
+
     def handle_folder_selected(self, folder):
         print(f"Selected Folder: {folder}")
-        
+
         scanner = FolderScanner()
-        
         stats = scanner.scan(folder)
-        
-        print(stats)    
-        
-    
+
+        self.stats_card.update_stats(stats)
+
+        self.stats_card.show()
+        self.stats_card.update()
+        self.stats_card.repaint()

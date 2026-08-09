@@ -82,7 +82,7 @@ class HeroCard(QFrame):
         event.acceptProposedAction()
 
     def dropEvent(self, event):
-        print("drop Event")
+
         
         urls = event.mimeData().urls()
 
@@ -91,8 +91,7 @@ class HeroCard(QFrame):
 
         folder = urls[0].toLocalFile()
         
-        print(f"Dropped Folder: {folder}")
-        
+    
 
         self.folder_dropped.emit(folder)
 
