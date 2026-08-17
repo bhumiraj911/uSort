@@ -42,14 +42,11 @@ class StatsCard(QFrame):
         main_layout.setContentsMargins(0, 0, 0, 0)
 
         self.scroll = QScrollArea()
-        self.scroll.setVerticalScrollBarPolicy(
-    Qt.ScrollBarAsNeeded)
-        
+        self.scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+
         self.scroll.setWidgetResizable(True)
         self.scroll.setFrameShape(QFrame.NoFrame)
-        self.scroll.setHorizontalScrollBarPolicy(
-            Qt.ScrollBarAlwaysOff
-        )
+        self.scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
 
         self.content = QWidget()
 
@@ -70,14 +67,16 @@ class StatsCard(QFrame):
         """)
 
         self.content_layout.addWidget(self.title)
-        
-        self.scroll.setWidget(self.content)  
-        
+
+        self.scroll.setWidget(self.content)
+
         main_layout.addWidget(self.scroll)
 
     def add_section(self, title):
 
-        section = QLabel(title)
+        icon = self.get_category_icon(title)
+
+        section = QLabel(f"{icon} {title}")
 
         section.setStyleSheet(f"""
             font-size: 18px;
@@ -86,6 +85,22 @@ class StatsCard(QFrame):
         """)
 
         self.content_layout.addWidget(section)
+
+    def add_separator(self):
+
+        separator = QFrame()
+
+        separator.setFrameShape(QFrame.Shape.HLine)
+        separator.setFrameShadow(QFrame.Shadow.Sunken)
+
+        separator.setStyleSheet(f"""
+            color: {theme.BORDER};
+            background-color: {theme.BORDER};
+            border: none;
+            max-height: 1px;
+        """)
+
+        self.content_layout.addWidget(separator)
 
     def add_row(self, label, value):
 
@@ -126,9 +141,9 @@ class StatsCard(QFrame):
 
             if widget is not None:
                 widget.deleteLater()
-                
+
     def format_size(self, size):
-    
+
         units = ["B", "KB", "MB", "GB", "TB"]
 
         index = 0
@@ -141,34 +156,71 @@ class StatsCard(QFrame):
             return f"{int(size)} B"
 
         return f"{size:.2f} {units[index]}"
-    
-    
-    def update_stats(self, stats):
-        
-    
+
+    def update_stats(self, stats, folder_name):
+
         self.clear_content()
 
+        self.title.setText(f"Data present in {folder_name}")
+
+        # Summary
         self.add_row("Files", stats["total_files"])
         self.add_row("Folders", stats["total_folders"])
         self.add_row("Size", self.format_size(stats["total_size"]))
 
-        for category, files in stats.items():
+        self.add_separator()
 
-            if category in [
-                "total_files",
-                "total_folders",
-                "total_size",
-            ]:
+        # Category order
+        category_order = [
+            "documents",
+            "images",
+            "videos",
+            "audio",
+            "archives",
+            "others",
+            "no_extension",
+        ]
+
+        for category in category_order:
+
+            files = stats.get(category)
+
+            if not files:
                 continue
 
-            self.add_section(category.capitalize())
+            if category == "no_extension":
+                self.add_section("No Extension")
+            else:
+                self.add_section(category.capitalize())
 
-            for extension, count in files.items():
+            if category == "no_extension":
+                self.add_row("Files", sum(files.values()))
+            else:
+                for extension, count in sorted(
+                    files.items(),
+                    key=lambda item: item[1],
+                    reverse=True,
+                ):
+                    self.add_row(
+                        extension.upper(),
+                        count,
+                    )
 
-                self.add_row(
-                    extension.upper(),
-                    count,
-                )
-                
+            self.add_separator()
+
         self.content.adjustSize()
-               
+
+    def get_category_icon(self, category):
+
+        icons = {
+            "documents": "📄",
+            "images": "🖼️",
+            "videos": "🎥",
+            "audio": "🎵",
+            "archives": "🗜️",
+            "others": "📦",
+            "no_extension": "📄",
+            "no extension": "📄",
+        }
+
+        return icons.get(category.lower(), "📦")

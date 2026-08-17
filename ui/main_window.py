@@ -4,6 +4,8 @@ from PySide6.QtWidgets import (
     QGridLayout,
     QHBoxLayout,
     QFileDialog,
+    QStackedWidget,
+    QPushButton,
 )
 
 from ui import theme
@@ -11,6 +13,7 @@ from ui.hero_card import HeroCard
 from ui.option_card import OptionCard
 from core.scanner import FolderScanner
 from ui.stats_card import StatsCard
+from pathlib import Path
 
 
 class MainWindow(QWidget):
@@ -52,82 +55,152 @@ class MainWindow(QWidget):
         self.hero_card = HeroCard()
         self.layout.addWidget(self.hero_card)
 
-        # Main Content Area
-        self.content_layout = QHBoxLayout()
+        # Page Stack
+        self.pages = QStackedWidget()
+
+        self.dashboard_page = QWidget()
+        self.organize_page = QWidget()
+
+        # ==========================
+        # Organize Page
+        # ==========================
+
+        self.organize_layout = QVBoxLayout(self.organize_page)
+
+        self.back_button = QPushButton("← Back")
+
+        self.organize_layout.addWidget(self.back_button)
+
+        # ==========================
+        # Dashboard Page
+        # ==========================
+
+        self.content_layout = QHBoxLayout(self.dashboard_page)
+
         self.content_layout.setSpacing(theme.CARD_SPACING)
 
         # Stats Card
         self.stats_card = StatsCard()
         self.stats_card.hide()
 
-        self.content_layout.addWidget(self.stats_card, 1)
+        self.content_layout.addWidget(
+            self.stats_card,
+            1,
+        )
 
+        # ==========================
         # Option Cards
+        # ==========================
+
         self.grid = QGridLayout()
+
         self.grid.setSpacing(theme.CARD_SPACING)
 
-        self.date_card = OptionCard(
-            "📅",
-            "Date Template",
-            "Year → Month → Day"
-        )
-
-        self.type_card = OptionCard(
+        self.organize_card = OptionCard(
             "📂",
-            "File Type Template",
-            "Images • Videos"
-        )
-
-        self.templates_card = OptionCard(
-            "⭐",
-            "My Templates",
-            "No saved templates"
+            "Organize",
+            "Organize your files",
         )
 
         self.duplicates_card = OptionCard(
             "🗑️",
             "Remove Duplicates",
-            "Smart Detection"
+            "Smart Detection",
         )
 
-        self.grid.addWidget(self.date_card, 0, 0)
-        self.grid.addWidget(self.type_card, 0, 1)
-        self.grid.addWidget(self.templates_card, 1, 0)
-        self.grid.addWidget(self.duplicates_card, 1, 1)
+        self.templates_card = OptionCard(
+            "⭐",
+            "My Templates",
+            "No saved templates",
+        )
+
+        self.grid.addWidget(
+            self.organize_card,
+            0,
+            0,
+        )
+
+        self.grid.addWidget(
+            self.duplicates_card,
+            0,
+            1,
+        )
+
+        self.grid.addWidget(
+            self.templates_card,
+            1,
+            0,
+        )
 
         self.content_layout.addLayout(self.grid)
 
-        self.layout.addLayout(self.content_layout)
+        # ==========================
+        # Add Pages
+        # ==========================
 
-        # Connect Select Folder button
-        self.hero_card.browse_button.clicked.connect(
-            self.select_folder
-        )
+        self.pages.addWidget(self.dashboard_page)
+
+        self.pages.addWidget(self.organize_page)
+
+        self.layout.addWidget(self.pages)
+
+        # ==========================
+        # Connections
+        # ==========================
+
+        # Select Folder button
+        self.hero_card.browse_button.clicked.connect(self.select_folder)
 
         # Drop folder signal
         self.hero_card.folder_dropped.connect(
             lambda folder: self.handle_folder_selected(folder)
         )
 
+        # Organize card
+        self.organize_card.clicked.connect(self.open_organize)
+
+        # Back button
+        self.back_button.clicked.connect(self.back_to_dashboard)
+
         self.setLayout(self.layout)
 
     def select_folder(self):
+
         folder = QFileDialog.getExistingDirectory(
             self,
-            "Select Folder"
+            "Select Folder",
         )
 
         if folder:
             self.handle_folder_selected(folder)
 
     def handle_folder_selected(self, folder):
+
         print(f"Selected Folder: {folder}")
 
         scanner = FolderScanner()
+
         stats = scanner.scan(folder)
 
-        self.stats_card.update_stats(stats)
+        self.current_stats = stats
+
+        folder_name = Path(folder).name
+
+        self.stats_card.update_stats(
+            stats,
+            folder_name,
+        )
 
         self.stats_card.show()
+
         self.stats_card.update()
+
         self.stats_card.repaint()
+
+    def open_organize(self):
+
+        self.pages.setCurrentWidget(self.organize_page)
+
+    def back_to_dashboard(self):
+
+        self.pages.setCurrentWidget(self.dashboard_page)
