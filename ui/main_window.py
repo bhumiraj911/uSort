@@ -5,7 +5,6 @@ from PySide6.QtWidgets import (
     QHBoxLayout,
     QFileDialog,
     QStackedWidget,
-    QPushButton,
 )
 
 from ui import theme
@@ -14,10 +13,10 @@ from ui.option_card import OptionCard
 from core.scanner import FolderScanner
 from ui.stats_card import StatsCard
 from pathlib import Path
+from ui.organize_page import OrganizePage
 
 
 class MainWindow(QWidget):
-
     def __init__(self):
         super().__init__()
 
@@ -59,21 +58,9 @@ class MainWindow(QWidget):
         self.pages = QStackedWidget()
 
         self.dashboard_page = QWidget()
-        self.organize_page = QWidget()
+        self.organize_page = OrganizePage()
 
-        # ==========================
-        # Organize Page
-        # ==========================
-
-        self.organize_layout = QVBoxLayout(self.organize_page)
-
-        self.back_button = QPushButton("← Back")
-
-        self.organize_layout.addWidget(self.back_button)
-
-        # ==========================
         # Dashboard Page
-        # ==========================
 
         self.content_layout = QHBoxLayout(self.dashboard_page)
 
@@ -88,9 +75,7 @@ class MainWindow(QWidget):
             1,
         )
 
-        # ==========================
         # Option Cards
-        # ==========================
 
         self.grid = QGridLayout()
 
@@ -134,9 +119,7 @@ class MainWindow(QWidget):
 
         self.content_layout.addLayout(self.grid)
 
-        # ==========================
         # Add Pages
-        # ==========================
 
         self.pages.addWidget(self.dashboard_page)
 
@@ -144,9 +127,7 @@ class MainWindow(QWidget):
 
         self.layout.addWidget(self.pages)
 
-        # ==========================
         # Connections
-        # ==========================
 
         # Select Folder button
         self.hero_card.browse_button.clicked.connect(self.select_folder)
@@ -160,7 +141,7 @@ class MainWindow(QWidget):
         self.organize_card.clicked.connect(self.open_organize)
 
         # Back button
-        self.back_button.clicked.connect(self.back_to_dashboard)
+        self.organize_page.back_requested.connect(self.back_to_dashboard)
 
         self.setLayout(self.layout)
 
@@ -183,6 +164,8 @@ class MainWindow(QWidget):
         stats = scanner.scan(folder)
 
         self.current_stats = stats
+
+        self.organize_page.set_stats(stats)
 
         folder_name = Path(folder).name
 
