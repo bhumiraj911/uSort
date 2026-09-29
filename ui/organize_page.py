@@ -489,3 +489,41 @@ class OrganizePage(QWidget):
                 break
 
         self.continue_button.setEnabled(has_selection)
+
+    def get_selected_categories(self):
+
+        selected_categories = []
+
+        for index in range(self.categories_layout.count()):
+
+            item = self.categories_layout.itemAt(index)
+
+            widget = item.widget()
+
+            if not isinstance(
+                widget,
+                CategoryRow,
+            ):
+                continue
+
+            selected_extensions = []
+
+            for (
+                extension,
+                checkbox,
+            ) in widget.extension_checkboxes.items():
+
+                if checkbox.isChecked():
+
+                    selected_extensions.append(extension)
+
+            if selected_extensions:
+
+                selected_categories.append(
+                    {
+                        "category": widget.category,
+                        "extensions": selected_extensions,
+                    }
+                )
+
+        return selected_categories
