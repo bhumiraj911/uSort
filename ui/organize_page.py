@@ -31,9 +31,7 @@ class CategoryRow(QFrame):
 
         self.setObjectName("categoryRow")
 
-        # ==========================
         # Main Layout
-        # ==========================
 
         self.main_layout = QVBoxLayout(self)
 
@@ -46,14 +44,13 @@ class CategoryRow(QFrame):
 
         self.main_layout.setSpacing(8)
 
-        # ==========================
         # Header
-        # ==========================
 
         self.header = QHBoxLayout()
         self.header.setSpacing(10)
 
         # Expand button
+
         self.expand_button = QPushButton("▶")
         self.expand_button.setFixedSize(28, 28)
         self.expand_button.setCursor(Qt.PointingHandCursor)
@@ -61,11 +58,13 @@ class CategoryRow(QFrame):
         self.expand_button.clicked.connect(self.toggle_expanded)
 
         # Category checkbox
+
         self.checkbox = QCheckBox()
 
-        self.checkbox.stateChanged.connect(self.category_checkbox_changed)
+        self.checkbox.clicked.connect(self.category_checkbox_changed)
 
         # Icon
+
         self.icon_label = QLabel(icon)
 
         self.icon_label.setStyleSheet("""
@@ -74,6 +73,7 @@ class CategoryRow(QFrame):
         """)
 
         # Category name
+
         self.name_label = QLabel(category)
 
         self.name_label.setStyleSheet(f"""
@@ -84,6 +84,7 @@ class CategoryRow(QFrame):
         """)
 
         # Count
+
         self.count_label = QLabel(str(sum(files.values())))
 
         self.count_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
@@ -108,9 +109,7 @@ class CategoryRow(QFrame):
 
         self.main_layout.addLayout(self.header)
 
-        # ==========================
         # Extensions
-        # ==========================
 
         self.extensions_widget = QWidget()
 
@@ -155,31 +154,30 @@ class CategoryRow(QFrame):
 
         self.update_style()
 
-    # ==========================
     # Expand / Collapse
-    # ==========================
 
     def toggle_expanded(self):
 
         self.expanded = not self.expanded
 
         if self.expanded:
+
             self.expand_button.setText("▼")
+
             self.extensions_widget.show()
+
         else:
+
             self.expand_button.setText("▶")
+
             self.extensions_widget.hide()
 
-    # ==========================
     # Category Selection
-    # ==========================
 
     def category_checkbox_changed(
         self,
-        state,
+        checked,
     ):
-
-        checked = state == Qt.Checked
 
         for checkbox in self.extension_checkboxes.values():
 
@@ -191,9 +189,7 @@ class CategoryRow(QFrame):
 
         self.selection_changed.emit()
 
-    # ==========================
     # Extension Selection
-    # ==========================
 
     def extension_changed(self):
 
@@ -207,21 +203,22 @@ class CategoryRow(QFrame):
         self.checkbox.blockSignals(True)
 
         if checked_count == len(checkboxes):
+
             self.checkbox.setCheckState(Qt.Checked)
 
         elif checked_count == 0:
+
             self.checkbox.setCheckState(Qt.Unchecked)
 
         else:
+
             self.checkbox.setCheckState(Qt.PartiallyChecked)
 
         self.checkbox.blockSignals(False)
 
         self.selection_changed.emit()
 
-    # ==========================
     # Styling
-    # ==========================
 
     def update_style(self):
 
@@ -305,9 +302,7 @@ class OrganizePage(QWidget):
 
         self.layout.setSpacing(theme.CARD_SPACING)
 
-        # ==========================
         # Top Bar
-        # ==========================
 
         top_bar = QHBoxLayout()
 
@@ -335,9 +330,7 @@ class OrganizePage(QWidget):
 
         self.layout.addLayout(top_bar)
 
-        # ==========================
         # Subtitle
-        # ==========================
 
         self.subtitle_label = QLabel("Choose what you want to organize")
 
@@ -348,9 +341,7 @@ class OrganizePage(QWidget):
 
         self.layout.addWidget(self.subtitle_label)
 
-        # ==========================
         # Categories Container
-        # ==========================
 
         self.categories_container = QWidget()
 
@@ -378,9 +369,7 @@ class OrganizePage(QWidget):
             1,
         )
 
-        # ==========================
         # Continue Button
-        # ==========================
 
         self.continue_button = QPushButton("Continue →")
 
@@ -414,11 +403,12 @@ class OrganizePage(QWidget):
 
         self.layout.addWidget(self.continue_button)
 
-    # ==========================
     # Load Scanner Data
-    # ==========================
 
-    def set_stats(self, stats):
+    def set_stats(
+        self,
+        stats,
+    ):
 
         self.stats = stats
 
@@ -446,9 +436,7 @@ class OrganizePage(QWidget):
 
         self.update_continue_state()
 
-    # ==========================
     # Clear Existing Categories
-    # ==========================
 
     def clear_categories(self):
 
@@ -461,11 +449,11 @@ class OrganizePage(QWidget):
             if widget:
                 widget.deleteLater()
 
-    # ==========================
     # Continue State
-    # ==========================
 
-    def update_continue_state(self):
+    def update_continue_state(
+        self,
+    ):
 
         has_selection = False
 
@@ -483,14 +471,18 @@ class OrganizePage(QWidget):
 
             if widget.checkbox.isChecked() or any(
                 checkbox.isChecked()
-                for checkbox in (widget.extension_checkboxes.values())
+                for checkbox in widget.extension_checkboxes.values()
             ):
+
                 has_selection = True
+
                 break
 
         self.continue_button.setEnabled(has_selection)
 
-    def get_selected_categories(self):
+    def get_selected_categories(
+        self,
+    ):
 
         selected_categories = []
 
