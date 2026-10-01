@@ -148,6 +148,16 @@ class PreviewPage(QWidget):
 
         total_files = 0
 
+        category_keys = {
+            "Documents": "documents",
+            "Images": "images",
+            "Videos": "videos",
+            "Audio": "audio",
+            "Archives": "archives",
+            "Others": "others",
+            "No Extension": "no_extension",
+        }
+
         for item in selected_categories:
 
             category = item["category"]
@@ -156,8 +166,13 @@ class PreviewPage(QWidget):
 
             category_count = 0
 
-            category_stats = stats.get(
+            category_key = category_keys.get(
                 category,
+                category,
+            )
+
+            category_stats = stats.get(
+                category_key,
                 {},
             )
 
@@ -216,6 +231,7 @@ class PreviewPage(QWidget):
             font-size: 15px;
             font-weight: 600;
             background: transparent;
+            border: none;
         """)
 
         arrow_label = QLabel("→")
@@ -224,6 +240,7 @@ class PreviewPage(QWidget):
             color: {theme.SECONDARY_TEXT};
             font-size: 18px;
             background: transparent;
+            border: none;
         """)
 
         destination_label = QLabel(destination)
@@ -232,6 +249,7 @@ class PreviewPage(QWidget):
             color: {theme.TEXT};
             font-size: 15px;
             background: transparent;
+            border: none;
         """)
 
         count_label = QLabel(f"{file_count} files")
@@ -240,6 +258,7 @@ class PreviewPage(QWidget):
             color: {theme.SECONDARY_TEXT};
             font-size: 13px;
             background: transparent;
+            border: none;
         """)
 
         layout.addWidget(category_label)

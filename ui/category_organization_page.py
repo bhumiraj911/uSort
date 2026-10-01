@@ -176,6 +176,7 @@ class CategoryOrganizationPage(QWidget):
             font-size: 15px;
             font-weight: 600;
             background: transparent;
+            border: none;
         """)
 
         # Arrow
@@ -186,6 +187,7 @@ class CategoryOrganizationPage(QWidget):
             color: {theme.SECONDARY_TEXT};
             font-size: 18px;
             background: transparent;
+            border: none;
         """)
 
         # Folder input
@@ -202,6 +204,7 @@ class CategoryOrganizationPage(QWidget):
                 border-radius: 6px;
                 padding: 8px;
                 font-size: 14px;
+                border: none;
             }}
 
             QLineEdit:focus {{

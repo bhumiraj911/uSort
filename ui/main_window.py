@@ -17,6 +17,7 @@ from ui.organize_page import OrganizePage
 from ui.organization_method_page import OrganizationMethodPage
 from ui.file_type_page import FileTypePage
 from ui.category_organization_page import CategoryOrganizationPage
+from ui.preview_page import PreviewPage
 
 from core.scanner import FolderScanner
 
@@ -77,6 +78,8 @@ class MainWindow(QWidget):
         self.file_type_page = FileTypePage()
 
         self.category_organization_page = CategoryOrganizationPage()
+
+        self.preview_page = PreviewPage()
 
         # Dashboard page
 
@@ -151,6 +154,8 @@ class MainWindow(QWidget):
 
         self.pages.addWidget(self.category_organization_page)
 
+        self.pages.addWidget(self.preview_page)
+
         self.layout.addWidget(self.pages)
 
         # Connections
@@ -196,6 +201,14 @@ class MainWindow(QWidget):
         # Back to file type
 
         self.category_organization_page.back_requested.connect(self.back_to_file_type)
+
+        # Open preview
+
+        self.category_organization_page.continue_requested.connect(self.open_preview)
+
+        # Back to category organization
+
+        self.preview_page.back_requested.connect(self.back_to_category_organization)
 
         self.setLayout(self.layout)
 
@@ -278,3 +291,19 @@ class MainWindow(QWidget):
     def back_to_file_type(self):
 
         self.pages.setCurrentWidget(self.file_type_page)
+
+    def open_preview(self):
+
+        folder_names = self.category_organization_page.get_folder_names()
+
+        self.preview_page.set_preview(
+            self.selected_categories,
+            folder_names,
+            self.current_stats,
+        )
+
+        self.pages.setCurrentWidget(self.preview_page)
+
+    def back_to_category_organization(self):
+
+        self.pages.setCurrentWidget(self.category_organization_page)
